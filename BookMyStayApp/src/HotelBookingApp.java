@@ -12,7 +12,7 @@ import java.util.Map;
  * @author Developer
  * @version 3.0
  */
-public class UseCase3InventorySetup {
+public class HotelBookingApp {
 
     /**
      * Centralized room inventory manager using HashMap.
