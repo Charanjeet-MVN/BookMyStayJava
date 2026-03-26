@@ -2,43 +2,68 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Use Case 3: Centralized Room Inventory Management
+ * Use Case 4: Room Search & Availability Check
  *
  * Description:
- * Replaces scattered availability variables with a centralized
- * HashMap to manage room inventory. Demonstrates single source
- * of truth using HashMap<String, Integer>.
+ * Enables read-only access to room availability. Guests can
+ * search and view available rooms without modifying inventory.
+ * Demonstrates separation of read and write operations.
  *
  * @author Developer
- * @version 3.0
+ * @version 4.0
  */
 public class HotelBookingApp {
 
     /**
-     * Centralized room inventory manager using HashMap.
+     * Room inventory manager.
      */
     static class RoomInventory {
         private Map<String, Integer> inventory;
+        private Map<String, Double> prices;
 
         public RoomInventory() {
             inventory = new HashMap<>();
             inventory.put("Single", 5);
             inventory.put("Double", 3);
-            inventory.put("Suite", 2);
+            inventory.put("Suite", 0);
+
+            prices = new HashMap<>();
+            prices.put("Single", 1500.0);
+            prices.put("Double", 2500.0);
+            prices.put("Suite", 5000.0);
         }
 
         public int getAvailability(String roomType) {
             return inventory.getOrDefault(roomType, 0);
         }
 
-        public void updateAvailability(String roomType, int count) {
-            inventory.put(roomType, count);
+        public Map<String, Integer> getInventory() {
+            return inventory;
         }
 
-        public void displayInventory() {
-            System.out.println("Current Room Inventory:");
-            for (Map.Entry<String, Integer> entry : inventory.entrySet()) {
-                System.out.println(entry.getKey() + ": " + entry.getValue() + " available");
+        public double getPrice(String roomType) {
+            return prices.getOrDefault(roomType, 0.0);
+        }
+    }
+
+    /**
+     * Search service for read-only room access.
+     */
+    static class RoomSearchService {
+        private RoomInventory inventory;
+
+        public RoomSearchService(RoomInventory inventory) {
+            this.inventory = inventory;
+        }
+
+        public void searchAvailableRooms() {
+            System.out.println("Available Rooms:");
+            for (Map.Entry<String, Integer> entry : inventory.getInventory().entrySet()) {
+                if (entry.getValue() > 0) {
+                    System.out.println(entry.getKey() + " Room - Available: "
+                            + entry.getValue()
+                            + ", Price: Rs." + inventory.getPrice(entry.getKey()) + "/night");
+                }
             }
         }
     }
@@ -50,12 +75,7 @@ public class HotelBookingApp {
      */
     public static void main(String[] args) {
         RoomInventory inventory = new RoomInventory();
-        inventory.displayInventory();
-
-        System.out.println("\nUpdating Single room availability to 4...");
-        inventory.updateAvailability("Single", 4);
-
-        System.out.println("\nUpdated Room Inventory:");
-        inventory.displayInventory();
+        RoomSearchService searchService = new RoomSearchService(inventory);
+        searchService.searchAvailableRooms();
     }
 }
